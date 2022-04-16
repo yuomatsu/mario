@@ -17,10 +17,10 @@ can.width = SCREEN_SIZE_W * 2;
 can.height = SCREEN_SIZE_H * 2;
 
 // ぼやけを修正
-vcon.mozimageSmoothingEnabled = false;
-vcon.msimageSmoothingEnabled = false;
-vcon.webkitimageSmoothingEnabled = false;
-vcon.imageSmoothingEnabled = false;
+con.mozimageSmoothingEnabled = false;
+con.msimageSmoothingEnabled = false;
+con.webkitimageSmoothingEnabled = false;
+con.imageSmoothingEnabled = false;
 
 
 let frameCount = 0;
@@ -28,19 +28,46 @@ let startTime;
 
 let chImg = new Image();
 chImg.src = "sprite.png";
-console.log(chImg.src)
+
+// マリオの位置
+// キーボード
+let keyb = {
+    // 'Left': '',
+    // 'Right': '',
+};
+
+let mario_x = 100;
+let mario_y = 100;
+// マリオの移動速度
+let mario_vx = 0;
 
 function update() {
+    // console.log(keyb)
+    if (keyb.Left) {
+        if (mario_vx > -2) mario_vx -= 0.1;
+    } else if (keyb.Right) {
+        if (mario_vx < 2) mario_vx += 0.1;
+    } else {
+        if (mario_vx > 0) mario_vx -= 0.1;
+        if (mario_vx < 0) mario_vx += 0.1;
+        // if(mario_vx == 0)mario_vx += 0;
+
+    }
+    mario_x += mario_vx;
+
 
 }
 
 function draw() {
     vcon.fillStyle = "#66AAFF";
     vcon.fillRect(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H);
-    vcon.drawImage(chImg, 0, 0, 16, 32, 0, 0, 16, 32);
+    // マリオ表示
+    vcon.drawImage(chImg, 0, 0, 16, 32, mario_x, mario_y, 16, 32);
 
+    // デバッグ
     vcon.font = "24px 'Impact'";
 
+    // 仮想画面から実画面に拡大表示
     con.drawImage(vcan, 0, 0, vcan.width, vcan.height, 0, 0, can.width, can.height);
 }
 
@@ -65,6 +92,8 @@ function mainLoop() {
             frameCount++;
             // 更新処理
             update();
+            console.log(keyb);
+            console.log(mario_x);
             if (++c >= 4) break;
         }
         // 描画処理
@@ -74,3 +103,20 @@ function mainLoop() {
     requestAnimationFrame(mainLoop);
 
 }
+
+
+// キーボードが押された時に呼ばれる
+document.onkeydown = function (e) {
+    // console.log(e.key);
+    if (e.key == "ArrowLeft") keyb.Left = true;
+    if (e.key == "ArrowRight") keyb.Right = true;
+    // console.log(keyb);
+};
+// キーボードが話された時に呼ばれる
+document.onkeyup = function (e) {
+    if (e.key == "ArrowLeft") keyb.Left = false;
+    if (e.key == "ArrowRight") keyb.Right = false;
+};
+// console.log(keyb)
+
+
