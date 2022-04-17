@@ -31,38 +31,72 @@ chImg.src = "sprite.png";
 
 // マリオの位置
 // キーボード
-let keyb = {
-    // 'Left': '',
-    // 'Right': '',
-};
+let keyb = {};
 
-let mario_x = 100;
-let mario_y = 100;
+// ビット演算を用いる
+let mario_x = 100 << 4;
+let mario_y = 100 << 4;
 // マリオの移動速度
 let mario_vx = 0;
+// マリオのスプライト番号
+let mario_sprite = 1;
+// マリオの状態（立っている時が0、歩いている時が1）
+let mario_anime = 0;
+// カウント
+let mario_acount = 0;
+let mario_dir = 0;
+
+
 
 function update() {
-    // console.log(keyb)
     if (keyb.Left) {
-        if (mario_vx > -2) mario_vx -= 0.1;
+        if(mario_anime == 0) mario_acount = 0;
+        mario_anime = 1;
+        mario_sprite = 48;
+        mario_dir = 1;
+        if (mario_vx > -2 * 16) mario_vx -= 1; // 16倍したいが0.1*16=1.6で小数になってしまうので1
+        if (mario_vx > 0) mario_vx -= 1;
+        if (mario_vx > 8) mario_anime = 2;
     } else if (keyb.Right) {
-        if (mario_vx < 2) mario_vx += 0.1;
+        if(mario_anime == 0) mario_acount = 0;
+        mario_anime = 1;
+        mario_sprite = 0;
+        mario_dir = 0;
+        if (mario_vx < 2 * 16) mario_vx += 1;
+        if (mario_vx < 0) mario_vx += 1;
+        if (mario_vx < -8) mario_anime = 2;
     } else {
-        if (mario_vx > 0) mario_vx -= 0.1;
-        if (mario_vx < 0) mario_vx += 0.1;
-        // if(mario_vx == 0)mario_vx += 0;
-
+        if (mario_vx > 0) mario_vx -= 1;
+        if (mario_vx < 0) mario_vx += 1;
+        // mario_vxが0ならばマリオは停止
+        if (!mario_vx) mario_anime = 0;
     }
+    mario_acount++;
+    if(Math.abs(mario_vx) == 32) mario_acount++;
+
+    if (mario_anime === 0) mario_sprite = 0;
+    // ここが分かりにくい
+    else if (mario_anime === 1) mario_sprite = 2 + ((mario_acount / 6) % 3);
+    else if (mario_anime === 2) mario_sprite = 5;
+
+    // マリオの向きを判定
+    if(mario_dir) mario_sprite += 48;
+
     mario_x += mario_vx;
+}
 
+function drawSprite(snum, x, y) {
 
+    let sx = (snum & 15) * 16;
+    let sy = (snum >> 4) * 16;
+    // マリオ表示
+    vcon.drawImage(chImg, sx, sy, 16, 32, x, y, 16, 32);
 }
 
 function draw() {
     vcon.fillStyle = "#66AAFF";
     vcon.fillRect(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H);
-    // マリオ表示
-    vcon.drawImage(chImg, 0, 0, 16, 32, mario_x, mario_y, 16, 32);
+    drawSprite(mario_sprite, mario_x >> 4, mario_y >> 4);
 
     // デバッグ
     vcon.font = "24px 'Impact'";
