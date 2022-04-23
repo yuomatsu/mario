@@ -38,6 +38,9 @@ let mario_x = 100 << 4;
 let mario_y = 100 << 4;
 // マリオの移動速度
 let mario_vx = 0;
+// マリオの上下移動速度
+let mario_vy = 0;
+
 // マリオのスプライト番号
 let mario_sprite = 1;
 // マリオの状態（立っている時が0、歩いている時が1）
@@ -45,44 +48,75 @@ let mario_anime = 0;
 // カウント
 let mario_acount = 0;
 let mario_dir = 0;
+// ジャンプフラグ
+let mario_jump = 0;
 
-
+const ANIME_JUMP = 4;
 
 function update() {
+    // アニメ用のカウンタ
+    mario_acount++;
+    if (Math.abs(mario_vx) == 32) mario_acount++;
+
+    // ジャンプ
+    if (keyb.aButton) {
+        if (mario_jump === 0) {
+            mario_anime = ANIME_JUMP;
+            mario_jump = 1;
+            mario_vy = -64;
+        }
+    }
+
+    // 重力
+    if (mario_vy < 64) mario_vy += 2;
+
+    // 着地
+    if (mario_y > 150 << 4) {
+        mario_jump = 0;
+        mario_vy = 0;
+        mario_y = 150 << 4;
+    }
+
+    // 移動
     if (keyb.Left) {
-        if(mario_anime == 0) mario_acount = 0;
-        mario_anime = 1;
+        if (mario_anime == 0) mario_acount = 0;
+        if (!mario_jump) mario_anime = 1;
         mario_sprite = 48;
         mario_dir = 1;
-        if (mario_vx > -2 * 16) mario_vx -= 1; // 16倍したいが0.1*16=1.6で小数になってしまうので1
+        if (mario_vx > -32) mario_vx -= 1; // 16倍したいが0.1*16=1.6で小数になってしまうので1
         if (mario_vx > 0) mario_vx -= 1;
-        if (mario_vx > 8) mario_anime = 2;
+        if (!mario_jump && mario_vx > 8) mario_anime = 2;
     } else if (keyb.Right) {
-        if(mario_anime == 0) mario_acount = 0;
-        mario_anime = 1;
+        if (mario_anime == 0) mario_acount = 0;
+        if (!mario_jump) mario_anime = 1;
         mario_sprite = 0;
         mario_dir = 0;
-        if (mario_vx < 2 * 16) mario_vx += 1;
+        if (mario_vx < 32) mario_vx += 1;
         if (mario_vx < 0) mario_vx += 1;
-        if (mario_vx < -8) mario_anime = 2;
+        if (!mario_jump && mario_vx < -8) mario_anime = 2;
     } else {
+        console.log(mario_jump);
         if (mario_vx > 0) mario_vx -= 1;
         if (mario_vx < 0) mario_vx += 1;
         // mario_vxが0ならばマリオは停止
-        if (!mario_vx) mario_anime = 0;
+        if (!mario_jump && !mario_vx) mario_anime = 0;
+        // if (mario_jump === 0 && !mario_vx) mario_anime = 0;
     }
-    mario_acount++;
-    if(Math.abs(mario_vx) == 32) mario_acount++;
 
+    // スプライトの決定
     if (mario_anime === 0) mario_sprite = 0;
-    // ここが分かりにくい
+    // マリオが歩いているとき
     else if (mario_anime === 1) mario_sprite = 2 + ((mario_acount / 6) % 3);
     else if (mario_anime === 2) mario_sprite = 5;
+    // ジャンプ
+    else if (mario_anime === ANIME_JUMP) mario_sprite = 6;
 
     // マリオの向きを判定
-    if(mario_dir) mario_sprite += 48;
+    if (mario_dir) mario_sprite += 48;
 
+    // 座標を返す
     mario_x += mario_vx;
+    mario_y += mario_vy;
 }
 
 function drawSprite(snum, x, y) {
@@ -126,8 +160,8 @@ function mainLoop() {
             frameCount++;
             // 更新処理
             update();
-            console.log(keyb);
-            console.log(mario_x);
+            // console.log(keyb);
+            // console.log(mario_x);
             if (++c >= 4) break;
         }
         // 描画処理
@@ -141,15 +175,19 @@ function mainLoop() {
 
 // キーボードが押された時に呼ばれる
 document.onkeydown = function (e) {
-    // console.log(e.key);
+    // console.log(e);
     if (e.key == "ArrowLeft") keyb.Left = true;
     if (e.key == "ArrowRight") keyb.Right = true;
+    if (e.key == "z") keyb.aButton = true;
+    if (e.key == "x") keyb.bButton = true;
     // console.log(keyb);
 };
 // キーボードが話された時に呼ばれる
 document.onkeyup = function (e) {
     if (e.key == "ArrowLeft") keyb.Left = false;
     if (e.key == "ArrowRight") keyb.Right = false;
+    if (e.key == "z") keyb.aButton = false;
+    if (e.key == "x") keyb.bButton = false;
 };
 // console.log(keyb)
 
