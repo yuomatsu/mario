@@ -52,6 +52,7 @@ let mario_dir = 0;
 let mario_jump = 0;
 
 const ANIME_JUMP = 4;
+const GRAVITY = 4;
 
 function update() {
     // アニメ用のカウンタ
@@ -63,15 +64,18 @@ function update() {
         if (mario_jump === 0) {
             mario_anime = ANIME_JUMP;
             mario_jump = 1;
-            mario_vy = -64;
         }
+        // ジャンプ中の速度を小さくしていく
+        if (mario_jump < 14) mario_vy = -(64-mario_jump);
     }
+    if (mario_jump) mario_jump++; 
 
     // 重力
-    if (mario_vy < 64) mario_vy += 2;
+    if (mario_vy < 64) mario_vy += GRAVITY;
 
     // 着地
     if (mario_y > 150 << 4) {
+        if (mario_anime === ANIME_JUMP) mario_anime = 1;
         mario_jump = 0;
         mario_vy = 0;
         mario_y = 150 << 4;
@@ -81,26 +85,29 @@ function update() {
     if (keyb.Left) {
         if (mario_anime == 0) mario_acount = 0;
         if (!mario_jump) mario_anime = 1;
-        mario_sprite = 48;
-        mario_dir = 1;
+        // mario_sprite = 48;
+        if (!mario_jump) mario_dir = 1;
         if (mario_vx > -32) mario_vx -= 1; // 16倍したいが0.1*16=1.6で小数になってしまうので1
         if (mario_vx > 0) mario_vx -= 1;
         if (!mario_jump && mario_vx > 8) mario_anime = 2;
     } else if (keyb.Right) {
         if (mario_anime == 0) mario_acount = 0;
         if (!mario_jump) mario_anime = 1;
-        mario_sprite = 0;
-        mario_dir = 0;
+        // mario_sprite = 0;
+        if (!mario_jump) mario_dir = 0;
         if (mario_vx < 32) mario_vx += 1;
         if (mario_vx < 0) mario_vx += 1;
         if (!mario_jump && mario_vx < -8) mario_anime = 2;
     } else {
-        console.log(mario_jump);
-        if (mario_vx > 0) mario_vx -= 1;
-        if (mario_vx < 0) mario_vx += 1;
-        // mario_vxが0ならばマリオは停止
-        if (!mario_jump && !mario_vx) mario_anime = 0;
-        // if (mario_jump === 0 && !mario_vx) mario_anime = 0;
+        // ジャンプしていないときは速度を帰る
+        if (!mario_jump) {
+            // console.log(mario_jump);
+            if (mario_vx > 0) mario_vx -= 1;
+            if (mario_vx < 0) mario_vx += 1;
+            // mario_vxが0ならばマリオは停止
+            if (!mario_vx) mario_anime = 0;
+            // if (mario_jump === 0 && !mario_vx) mario_anime = 0;
+        }
     }
 
     // スプライトの決定
