@@ -1,7 +1,3 @@
-const GAME_FPS = 1000 / 60;
-const SCREEN_SIZE_W = 256;
-const SCREEN_SIZE_H = 224;
-
 // 仮想キャンバスを作成
 let vcan = document.createElement("canvas");
 let vcon = vcan.getContext("2d")
@@ -36,79 +32,86 @@ let keyb = {};
 // マリオを定義する
 let mario = new Mario(100, 100)
 
+// フィールドを作る
+let field = new Field();
+
 function update() {
-    mario.update();
+  field.update();
+  mario.update();
 }
 
 function drawSprite(snum, x, y) {
 
-    let sx = (snum & 15) * 16;
-    let sy = (snum >> 4) * 16;
-    // マリオ表示
-    vcon.drawImage(chImg, sx, sy, 16, 32, x, y, 16, 32);
+  let sx = (snum & 15) * 16;
+  let sy = (snum >> 4) * 16;
+  // マリオ表示
+  vcon.drawImage(chImg, sx, sy, 16, 32, x, y, 16, 32);
 }
 
 function draw() {
-    vcon.fillStyle = "#66AAFF";
-    vcon.fillRect(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H);
-    mario.draw();
+  vcon.fillStyle = "#66AAFF";
+  vcon.fillRect(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H);
 
-    // デバッグ
-    vcon.font = "24px 'Impact'";
+  // 描画処理
+  field.draw();
+  mario.draw();
 
-    // 仮想画面から実画面に拡大表示
-    con.drawImage(vcan, 0, 0, vcan.width, vcan.height, 0, 0, can.width, can.height);
+  // デバッグ
+  vcon.font = "24px 'Impact'";
+
+  // 仮想画面から実画面に拡大表示
+  con.drawImage(vcan, 0, 0, vcan.width, vcan.height, 0, 0, can.width, can.height);
 }
 
 // 1秒間に60回mainLoopを実行
 setInterval(mainLoop, 1000 / 60);
 
 window.onload = function () {
-    startTime = performance.now();
-    mainLoop();
+  startTime = performance.now();
+  mainLoop();
 }
 
 function mainLoop() {
-    let nowTime = performance.now();
+  let nowTime = performance.now();
 
-    // 何回目の描画なのか算出
-    let nowFrame = (nowTime - startTime) / GAME_FPS;
-    if (nowFrame > frameCount) {
+  // 何回目の描画なのか算出
+  let nowFrame = (nowTime - startTime) / GAME_FPS;
+  if (nowFrame > frameCount) {
 
-        // 処理落ちした時の制御（もっといいやり方あるかも）
-        let c = 0;
-        while (nowFrame > frameCount) {
-            frameCount++;
-            // 更新処理
-            update();
-            // console.log(keyb);
-            // console.log(mario_x);
-            if (++c >= 4) break;
-        }
-        // 描画処理
-        draw();
-
+    // 処理落ちした時の制御（もっといいやり方あるかも）
+    let c = 0;
+    while (nowFrame > frameCount) {
+      frameCount++;
+      // 更新処理
+      update();
+      // console.log(keyb);
+      // console.log(mario_x);
+      if (++c >= 4) break;
     }
-    requestAnimationFrame(mainLoop);
+    // 描画処理
+    draw();
+
+  }
+  requestAnimationFrame(mainLoop);
 
 }
 
 
 // キーボードが押された時に呼ばれる
 document.onkeydown = function (e) {
-    // console.log(e);
-    if (e.key == "ArrowLeft") keyb.Left = true;
-    if (e.key == "ArrowRight") keyb.Right = true;
-    if (e.key == "z") keyb.aButton = true;
-    if (e.key == "x") keyb.bButton = true;
-    // console.log(keyb);
+  // console.log(e);
+  if (e.key == "ArrowLeft") keyb.Left = true;
+  if (e.key == "ArrowRight") keyb.Right = true;
+  if (e.key == "z") keyb.aButton = true;
+  if (e.key == "x") keyb.bButton = true;
+  // console.log(keyb);
 };
 // キーボードが話された時に呼ばれる
 document.onkeyup = function (e) {
-    if (e.key == "ArrowLeft") keyb.Left = false;
-    if (e.key == "ArrowRight") keyb.Right = false;
-    if (e.key == "z") keyb.aButton = false;
-    if (e.key == "x") keyb.bButton = false;
+  if (e.key == "ArrowLeft") keyb.Left = false;
+  if (e.key == "ArrowRight") keyb.Right = false;
+  if (e.key == "z") keyb.aButton = false;
+  if (e.key == "x") keyb.bButton = false;
 };
 // console.log(keyb)
 
