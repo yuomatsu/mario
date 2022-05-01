@@ -150,7 +150,10 @@ class Mario {
 
   // 毎フレームごとの描画処理
   draw() {
-    drawSprite(this.snum, this.x >> 4, this.y >> 4);
+    // 背景の移動に合わせてマリオの位置を調整
+    let px = (this.x>>4) - field.scx;
+    let py = (this.y>>4) - field.scy;
+    drawSprite(this.snum, px, py);
   }
 
 

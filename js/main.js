@@ -42,8 +42,8 @@ function update() {
 
 function drawSprite(snum, x, y) {
 
-  let sx = (snum & 15) * 16;
-  let sy = (snum >> 4) * 16;
+  let sx = (snum & 15) << 4;
+  let sy = (snum >> 4) << 4;
   // マリオ表示
   vcon.drawImage(chImg, sx, sy, 16, 32, x, y, 16, 32);
 }
@@ -105,6 +105,9 @@ document.onkeydown = function (e) {
   if (e.key == "z") keyb.aButton = true;
   if (e.key == "x") keyb.bButton = true;
   // console.log(keyb);
+  if (e.key == "a") field.scx--;
+  if (e.key == "s") field.scx++;
+
 };
 // キーボードが話された時に呼ばれる
 document.onkeyup = function (e) {
