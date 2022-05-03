@@ -31,6 +31,30 @@ class Mario {
     this.jump = 0;
   }
 
+  // 床の判定（）
+  checkFloor() {
+
+    if (this.vy <= 0) {
+      return;
+    }
+    let lx = this.x >> 4;
+    let ly = this.y >> 4;
+    if (
+      // マリオの足の両端より1px内側で判定
+      field.isBlock(lx + 1, ly + 31)
+      || field.isBlock(lx + 14, ly + 31
+      )
+    ) {
+      if (this.anime === ANIME_JUMP) {
+        this.anime = ANIME_WALK;
+      }
+      this.jump = 0;
+      this.vy = 0;
+      this.y = ((((ly + 31) >> 4) << 4) - 32) << 4;
+
+    }
+  }
+
   // ジャンプ
   updateJump() {
     if (keyb.aButton) {
@@ -138,21 +162,23 @@ class Mario {
     this.y += this.vy;
 
     // 着地
-    if (this.y > 160 << 4) {
-      if (this.anime === ANIME_JUMP) {
-        this.anime = ANIME_WALK;
-      }
-      this.jump = 0;
-      this.vy = 0;
-      this.y = 160 << 4;
-    }
+    this.checkFloor();
+
+    // if (this.y > 160 << 4) {
+    //   if (this.anime === ANIME_JUMP) {
+    //     this.anime = ANIME_WALK;
+    //   }
+    //   this.jump = 0;
+    //   this.vy = 0;
+    //   this.y = 160 << 4;
+    // }
   }
 
   // 毎フレームごとの描画処理
   draw() {
     // 背景の移動に合わせてマリオの位置を調整
-    let px = (this.x>>4) - field.scx;
-    let py = (this.y>>4) - field.scy;
+    let px = (this.x >> 4) - field.scx;
+    let py = (this.y >> 4) - field.scy;
     drawSprite(this.snum, px, py);
   }
 
