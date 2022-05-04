@@ -31,14 +31,15 @@ class Mario {
     this.jump = 0;
   }
 
-  // 床の判定（）
+  // 床の判定
   checkFloor() {
-
     if (this.vy <= 0) {
       return;
     }
-    let lx = this.x >> 4;
-    let ly = this.y >> 4;
+
+    let lx = (this.x + this.vx) >> 4;
+    let ly = (this.y + this.vy) >> 4;
+
     if (
       // マリオの足の両端より1px内側で判定
       field.isBlock(lx + 1, ly + 31)
@@ -51,6 +52,51 @@ class Mario {
       this.jump = 0;
       this.vy = 0;
       this.y = ((((ly + 31) >> 4) << 4) - 32) << 4;
+
+    }
+  }
+
+  // 壁の判定（）
+  checkWall() {
+    let lx = (this.x + this.vx) >> 4;
+    let ly = (this.y + this.vy) >> 4;
+
+    if (
+      // 右側（大きいマリオは頭、胴、つま先の3点チェック）
+      field.isBlock(lx + 15, ly + 9)
+      || field.isBlock(lx + 15, ly + 15)
+      || field.isBlock(lx + 15, ly + 24)
+    ) {
+      this.vx = 0;
+      this.x -= 8; // 0.5px分左に寄せる
+    }
+    if (
+      // 左側（大きいマリオは頭、胴、つま先の3点チェック）
+      field.isBlock(lx, ly + 9)
+      || field.isBlock(lx, ly + 15)
+      || field.isBlock(lx, ly + 24)
+    ) {
+      this.vx = 0;
+      this.x += 8;
+    }
+  }
+
+  // 天井の判定
+  checkCeiling() {
+    if (this.vy >= 0) {
+      return;
+    }
+
+    let lx = (this.x + this.vx) >> 4;
+    let ly = (this.y + this.vy) >> 4;
+
+    if (
+      // +6はジャンプ中の手を考慮するため
+      field.isBlock(lx + 8, ly + 6)
+    ) {
+      // ジャンプを終わらせるためjumpを15に指定
+      this.jump = 15;
+      this.vy = 0;
 
     }
   }
@@ -161,8 +207,14 @@ class Mario {
     this.x += this.vx;
     this.y += this.vy;
 
-    // 着地
+    // 壁の判定
+    this.checkWall();
+
+    // 床の判定
     this.checkFloor();
+
+    // 天井の判定
+    this.checkCeiling();
 
     // if (this.y > 160 << 4) {
     //   if (this.anime === ANIME_JUMP) {
