@@ -116,6 +116,4 @@ document.onkeyup = function (e) {
   if (e.key == "z") keyb.aButton = false;
   if (e.key == "x") keyb.bButton = false;
 };
-// console.log(keyb)
-
 
