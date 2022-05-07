@@ -90,13 +90,15 @@ class Mario {
     let lx = (this.x + this.vx) >> 4;
     let ly = (this.y + this.vy) >> 4;
 
-    if (
-      // +6はジャンプ中の手を考慮するため
-      field.isBlock(lx + 8, ly + 6)
-    ) {
+    // +6はジャンプ中の手を考慮するため
+    let bl = field.isBlock(lx + 8, ly + 6);
+    if (bl) {
       // ジャンプを終わらせるためjumpを15に指定
       this.jump = 15;
       this.vy = 0;
+
+      block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4))
+
 
     }
   }

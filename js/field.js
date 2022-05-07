@@ -44,10 +44,9 @@ class Field {
   isBlock(x, y) {
     let bl = fieldData[(y >> 4) * FIELD_SIZE_W + (x >> 4)];
     if (bl < 368) {
-      return false;
-    } else {
-      return blType[bl - 368] === 1;
+      return 0;
     }
+    return blType[bl - 368] === 1 ? bl : 0;
   }
 
   update() {
@@ -58,6 +57,12 @@ class Field {
   }
 
   drawBlock(bl, px, py) {
+    // ？ブロックの点滅
+    const anim = [0, 1, 2, 1, 0];
+    if (bl === 368) {
+      bl += anim[(frameCount >> 3) % 5];
+    }
+
     let sx = (bl & 15) << 4;
     let sy = (bl >> 4) << 4;
     // 背景表示
