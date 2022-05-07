@@ -35,8 +35,20 @@ let mario = new Mario(100, 100)
 // フィールドを作る
 let field = new Field();
 
+// ブロックのオブジェクト
+let block = [];
+
 function update() {
+  // フィールドを更新
   field.update();
+  // スプライトのブロックを更新
+  for (let i = block.length - 1; i >= 0; i--) {
+    block[i].update();
+    if (block[i].kill) {
+      block.splice(i, 1)
+    }
+  }
+  // マリオを更新
   mario.update();
 }
 
@@ -54,6 +66,10 @@ function draw() {
 
   // 描画処理
   field.draw();
+  // スプライトのブロックを表示
+  for (let i = 0; i < block.length; i++) {
+    block[i].draw();
+  }
   mario.draw();
 
   // デバッグ
@@ -100,10 +116,10 @@ function mainLoop() {
 // キーボードが押された時に呼ばれる
 document.onkeydown = function (e) {
   // console.log(e);
-  if (e.key == "ArrowLeft") keyb.Left = true;
-  if (e.key == "ArrowRight") keyb.Right = true;
-  if (e.key == "z") keyb.aButton = true;
-  if (e.key == "x") keyb.bButton = true;
+  if (e.key === "ArrowLeft") keyb.Left = true;
+  if (e.key === "ArrowRight") keyb.Right = true;
+  if (e.key === "z") keyb.aButton = true;
+  if (e.key === "x") keyb.bButton = true;
   // console.log(keyb);
   if (e.key == "a") field.scx--;
   if (e.key == "s") field.scx++;
