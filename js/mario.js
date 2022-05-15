@@ -97,9 +97,15 @@ class Mario {
       this.jump = 15;
       this.vy = 0;
 
-      block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4))
-
-
+      if (bl != 371) {
+        block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4));
+      } else {
+        // ブロックが壊れたら4方向に散らばる
+        block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4, 1, 20, -60));
+        block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4, 1, -20, -60));
+        block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4, 1, 20, -20));
+        block.push(new Block(bl, (lx + 8) >> 4, (ly + 5) >> 4, 1, -20, -20));
+      }
     }
   }
 
